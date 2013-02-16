@@ -1,4 +1,3 @@
-//g++ -shared -o leapmidi.so leapmidi.cpp -framework CoreMIDI -framework CoreServices -framework CoreAudio -I/usr/local/Cellar/lua/5.1.5/include/ -L/usr/local/Cellar/lua/5.1.5/lib/ -L../Leap_SDK/include -llua -Wall -fPIC
 #include <CoreMIDI/CoreMIDI.h>
 #include <unistd.h>               /* for sleep() function                */
 #include <mach/mach_time.h>       /* for mach_absolute_time()            */
@@ -10,8 +9,8 @@ extern "C" {
 }
 #include <stdlib.h>
 #include <stdio.h>
-#include "SampleListener.h"
 #include "Leap.h"
+#include "SampleListener.h"
 using namespace Leap;
 
 #define MESSAGESIZE 3             /* byte count for MIDI note messages   */
@@ -46,7 +45,8 @@ int main(int argc, char *args[])
 
     pkt = MIDIPacketListInit(pktList);
 
-      SampleListener listener;
+      // Create a sample listener and controller
+  SampleListener listener;
   Controller controller;
 
   // Have the sample listener receive events from the controller
@@ -58,7 +58,7 @@ int main(int argc, char *args[])
 
   // Remove the sample listener when done
   controller.removeListener(listener);
-
+/*
     //Byte notemessage[MESSAGESIZE];
     for (i = 0; i < 100; i++) {
         //play_arpeggio(pktList, pkt, pktBuffer, sizeof(pktBuffer));
@@ -70,7 +70,7 @@ int main(int argc, char *args[])
         }
         sleep(10);
     }
-
+*/
     return 0;
 }
 
