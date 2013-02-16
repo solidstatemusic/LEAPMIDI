@@ -28,7 +28,7 @@ static const struct luaL_reg leapmidi [] = {
 int main(int argc, char *args[])
 {
       // Create a sample listener and controller
-   /* SampleListener listener;
+   SampleListener listener;
     Controller controller;
 
   // Have the sample listener receive events from the controller
@@ -36,21 +36,21 @@ int main(int argc, char *args[])
 
     int finger1_note = 0;
     load("./testmidi.lua", &finger1_note);
-*/
+
   // Keep this process running until Enter is pressed
-    /*
+    
     std::cout << "Press Enter to quit..." << std::endl;
     std::cin.get();
-*/
+
   // Remove the sample listener when done
- //   controller.removeListener(listener);
-    MidiController midiController;
+    controller.removeListener(listener);
+    /*MidiController midiController;
     int i=0;
     for (i = 0; i < 100; i++) {
         midiController.play_arpeggio();
         midiController.handle();
         sleep(5);
-    }
+    }*/
 /*
     //Byte notemessage[MESSAGESIZE];
     for (i = 0; i < 100; i++) {

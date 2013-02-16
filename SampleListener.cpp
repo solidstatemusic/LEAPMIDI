@@ -1,5 +1,6 @@
 #include "Leap.h"
 #include "SampleListener.h"
+
 using namespace Leap;
 
 int finger1_state = 0;
@@ -29,6 +30,9 @@ void SampleListener::onFrame(const Controller& controller) {
         if (fingers.count() == 1) {
             if (finger1_state != 1) {
                 printf("1 finger detected\n");
+                        midiController.play_arpeggio();
+                    midiController.handle();
+
             }
             finger1_state = 1;
         }

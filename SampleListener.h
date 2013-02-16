@@ -2,6 +2,7 @@
 #define SAMPLELISTENER_H
 
 #include "Leap.h"
+#include "MidiController.h"
 class SampleListener : public Leap::Listener {
   public:
     virtual void onInit(const Leap::Controller&);
@@ -11,6 +12,7 @@ class SampleListener : public Leap::Listener {
     virtual void onFrame(const Leap::Controller&);
   private:
   	int finger1_state;
+  	MidiController midiController;
 };
 
 
