@@ -9,6 +9,8 @@ class SampleListener : public Leap::Listener {
     virtual void onDisconnect(const Leap::Controller&);
     virtual void onExit(const Leap::Controller&);
     virtual void onFrame(const Leap::Controller&);
+  private:
+  	int finger1_state;
 };
 
 

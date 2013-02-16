@@ -2,6 +2,8 @@
 #include "SampleListener.h"
 using namespace Leap;
 
+int finger1_state = 0;
+
 void SampleListener::onInit(const Controller& controller) {
   std::cout << "Initialized" << std::endl;
 }
@@ -19,6 +21,29 @@ void SampleListener::onExit(const Controller& controller) {
 }
 
 void SampleListener::onFrame(const Controller& controller) {
+    const Frame frame = controller.frame();
+    if (!frame.hands().empty()) {
+        // Get the first hand
+        const Hand hand = frame.hands()[0];
+        const FingerList fingers = hand.fingers();
+        if (fingers.count() == 1) {
+            if (finger1_state != 1) {
+                printf("1 finger detected\n");
+            }
+            finger1_state = 1;
+        }
+        else
+        {
+            if (finger1_state == 1) {
+                if (fingers.count() < 1) { // just for now, this check will need to be removed later
+                    printf("finger went away\n");
+                }
+            }
+
+            finger1_state = 0;
+        }
+    }
+    /*
   // Get the most recent frame and report some basic information
   const Frame frame = controller.frame();
   std::cout << "Frame id: " << frame.id()
@@ -56,5 +81,5 @@ void SampleListener::onFrame(const Controller& controller) {
     std::cout << "Hand pitch: " << direction.pitch() * RAD_TO_DEG << " degrees, "
               << "roll: " << normal.roll() * RAD_TO_DEG << " degrees, "
               << "yaw: " << direction.yaw() * RAD_TO_DEG << " degrees" << std::endl << std::endl;
-  }
+  }*/
 }

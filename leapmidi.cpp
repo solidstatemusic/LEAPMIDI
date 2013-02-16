@@ -21,6 +21,7 @@ void _note_off(int channel, Byte note, MIDITimeStamp timestamp, MIDIPacketList *
 
 /* lua api fxns */
 static int l_play_arpeggio (lua_State *L);
+void load (const char *filename, int *finger1_note);
 
 // register fxns with lua
 static const struct luaL_reg leapmidi [] = {
@@ -36,28 +37,36 @@ int main(int argc, char *args[])
     MIDIPacketList* pktList;
     pktList = (MIDIPacketList*) pktBuffer;
     MIDIPacket     *pkt;
-    int             i;
 
     MIDIClientCreate(CFSTR("LEAPMIDI"), NULL, NULL,
-            &theMidiClient);
+        &theMidiClient);
     MIDISourceCreate(theMidiClient, CFSTR("LEAPMIDI Source"),
-            &midiOut);
+        &midiOut);
 
     pkt = MIDIPacketListInit(pktList);
 
       // Create a sample listener and controller
-  SampleListener listener;
-  Controller controller;
+    SampleListener listener;
+    Controller controller;
 
   // Have the sample listener receive events from the controller
-  controller.addListener(listener);
+    controller.addListener(listener);
+
+    int finger1_note = 0;
+    load("./testmidi.lua", &finger1_note);
 
   // Keep this process running until Enter is pressed
-  std::cout << "Press Enter to quit..." << std::endl;
-  std::cin.get();
+    std::cout << "Press Enter to quit..." << std::endl;
+    std::cin.get();
 
   // Remove the sample listener when done
-  controller.removeListener(listener);
+    controller.removeListener(listener);
+    play_arpeggio(pktList, pkt, pktBuffer, sizeof(pktBuffer));
+      if (pkt == NULL || MIDIReceived(midiOut, pktList)) {
+            printf("failed to send the midi.\n");
+        } else {
+            printf("sent!\n");
+        }
 /*
     //Byte notemessage[MESSAGESIZE];
     for (i = 0; i < 100; i++) {
@@ -79,7 +88,7 @@ void _note_on(int channel, Byte note, Byte velocity, MIDITimeStamp timestamp, MI
     printf("Note on, value: %02X, velocity: %02X, time: %llu\n", note, velocity, timestamp);
     Byte notemessage[MESSAGESIZE] = {0x90, note, velocity};
     *pkt = MIDIPacketListAdd(pktList, bufferSize,
-            *pkt, timestamp, MESSAGESIZE, notemessage);
+        *pkt, timestamp, MESSAGESIZE, notemessage);
 }
 
 void _note_off(int channel, Byte note, MIDITimeStamp timestamp, MIDIPacketList *pktList, MIDIPacket **pkt, char *pktBuffer, uint64_t bufferSize)
@@ -87,7 +96,7 @@ void _note_off(int channel, Byte note, MIDITimeStamp timestamp, MIDIPacketList *
     printf("Note off, value: %02X, time: %llu\n", note, timestamp);
     Byte notemessage[MESSAGESIZE] = {0x80, note, 0x00};
     *pkt = MIDIPacketListAdd(pktList, bufferSize,
-            *pkt, timestamp, MESSAGESIZE, notemessage);
+        *pkt, timestamp, MESSAGESIZE, notemessage);
 }
 
 void play_arpeggio(MIDIPacketList *pktList, MIDIPacket *pkt, char *pktBuffer, uint64_t bufferSize)
@@ -116,9 +125,32 @@ static int l_play_arpeggio (lua_State *L) {
 }
 
 extern "C" {
-    int luaopen_leapmidi (lua_State *L) {
-        printf("Opening lib\n");
-        luaL_register(L, "leapmidi", leapmidi);
-        return 1;
+    void error (lua_State *L, const char *error) {
+        lua_pushstring(L, error);
+        lua_error(L);
     }
+
+    void load (const char *filename, int *finger1_note) {
+        lua_State *L = lua_open();
+        luaL_openlibs(L);
+        printf("Loading conf from %s\n", filename); 
+        if (luaL_loadfile(L, filename) || lua_pcall(L, 0, 0, 0))
+        {
+            error(L, "cannot run configuration file");
+        }
+
+        lua_getglobal(L, "finger1_note");
+        if (!lua_isnumber(L, -1))
+            error(L, "`finger1_note' should be a number");
+        *finger1_note = (int)lua_tonumber(L, -1);
+
+        printf("Finger 1 will play the note %d\n", *finger1_note);
+        lua_close(L);
+    }
+
+int luaopen_leapmidi (lua_State *L) {
+    printf("Opening lib\n");
+    luaL_register(L, "leapmidi", leapmidi);
+    return 1;
+}
 }
