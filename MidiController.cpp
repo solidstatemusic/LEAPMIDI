@@ -16,6 +16,8 @@ MidiController::MidiController() {
     	printf("1Nah it's a nice packet... length %d\n", pkt->length);
     }
 
+    // some reason sleep here makes first event trigger
+    sleep(1);
 }
 
 void MidiController::play_arpeggio()
