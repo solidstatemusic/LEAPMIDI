@@ -118,7 +118,6 @@ static int l_play_arpeggio (lua_State *L) {
 extern "C" {
     int luaopen_leapmidi (lua_State *L) {
         printf("Opening lib\n");
-        //luaL_openlib(L, "mylib", mylib, 0);
         luaL_register(L, "leapmidi", leapmidi);
         return 1;
     }
